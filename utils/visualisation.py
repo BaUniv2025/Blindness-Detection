@@ -53,7 +53,7 @@ def generate_gradcam(model, image_tensor, target_class, conv_layer_name='conv3')
     return overlay, cam_resized
 
 
-def draw_aggressive_merged_boxes(overlay, cam_resized, threshold=0.5, dilation_iter=3, min_area=300, merge_distance=30):
+def draw_aggressive_merged_boxes(overlay, cam_resized, threshold=0.5, dilation_iter=3, min_area=300, merge_distance=30, line_width=2):
     binary_map = np.uint8(cam_resized > threshold)
     kernel = np.ones((3, 3), np.uint8)
     dilated = cv2.dilate(binary_map, kernel,  # type: ignore
@@ -87,6 +87,6 @@ def draw_aggressive_merged_boxes(overlay, cam_resized, threshold=0.5, dilation_i
 
     boxed = overlay.copy()
     for x1, y1, x2, y2 in merged:
-        cv2.rectangle(boxed, (x1, y1), (x2, y2), (255, 255, 255), 2)
+        cv2.rectangle(boxed, (x1, y1), (x2, y2), (255, 255, 255), line_width)
 
     return boxed
