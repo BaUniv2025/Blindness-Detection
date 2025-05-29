@@ -11,7 +11,7 @@ from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 st.set_page_config(page_title="Диагностика DR", layout="centered")
 st.title("🧠 Классификация глазного дна: Healthy / Diabetic Retinopathy")
 
-class_names = ["Diabetic Retinopathy", "Healthy"]
+class_names = ["Healthy", "Diabetic Retinopathy"]
 
 # --- Определение устройства ---
 device = torch.device(
@@ -59,8 +59,8 @@ if uploaded_file:
         prediction = int(prob >= 0.5)
 
     # --- Вывод вероятностей ---
-    prob_dr = 1 - prob
-    prob_healthy = prob
+    prob_healthy = 1 - prob
+    prob_dr = prob
     pred_class = class_names[prediction]
 
     st.markdown(f"### Предсказание: **{pred_class}**")
