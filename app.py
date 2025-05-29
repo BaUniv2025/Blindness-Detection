@@ -27,7 +27,7 @@ device = torch.device(
 def load_model():
     model = BinaryCNN()
     model.load_state_dict(torch.load(
-        "data/initial_model.pth", map_location=device))
+        "data/model1.pth", map_location=device))
     model.to(device)
     model.eval()
     return model
