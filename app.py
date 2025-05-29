@@ -101,9 +101,11 @@ if uploaded_file:
     show_side_by_side(resized_image, boxed_overlay)
 
     # --- Скачивание результата ---
+    boxed_bgr = cv2.cvtColor(boxed_overlay, cv2.COLOR_RGB2BGR)
+
     st.download_button(
-        label="📥 Скачать изображение с зонами",
-        data=cv2.imencode(".png", boxed_overlay)[1].tobytes(),
+        label="📥 Скачать изображение с зонами внимания",
+        data=cv2.imencode(".png", boxed_bgr)[1].tobytes(),
         file_name="gradcam_boxes.png",
         mime="image/png"
     )
