@@ -33,3 +33,43 @@ class BinaryCNN(nn.Module):
         x = self.dropout(x)
         x = self.fc(x)
         return x  # логиты (без сигмоиды)
+
+
+class BinaryImprovedCNN(nn.Module):
+    def __init__(self, dropout_prob=0.3):  # уменьшен dropout для улучшения обучения
+        super(BinaryImprovedCNN, self).__init__()
+
+        # Блок 1: (224x224) → (112x112)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+
+        # Блок 2: (112x112) → (56x56)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+
+        # Блок 3: (56x56) → (28x28)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(128)
+
+        # Дополнительный блок 4 (новый): (28x28) → (14x14)
+        self.conv4 = nn.Conv2d(128, 256, kernel_size=3, padding=1)
+        self.bn4 = nn.BatchNorm2d(256)
+
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))  # → (batch, 256, 1, 1)
+        self.dropout = nn.Dropout(dropout_prob)
+        self.fc = nn.Linear(256, 1)  # выход — один логит для BCEWithLogitsLoss
+
+        self.activation = nn.LeakyReLU(0.1)  # альтернатива ReLU
+
+    def forward(self, x):
+        x = self.pool(self.activation(self.bn1(self.conv1(x))))
+        x = self.pool(self.activation(self.bn2(self.conv2(x))))
+        x = self.pool(self.activation(self.bn3(self.conv3(x))))
+        x = self.pool(self.activation(self.bn4(self.conv4(x))))
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)  # (batch, 256)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x  # логит (до сигмоиды)
