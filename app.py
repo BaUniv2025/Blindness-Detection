@@ -95,7 +95,13 @@ if uploaded_file:
     if prediction == 1:
         _, cam_resized = generate_gradcam(model, image_tensor, target_class=1)
         boxed_overlay = draw_aggressive_merged_boxes(
-            np.array(resized_image), cam_resized, threshold=0.2, dilation_iter=3, min_area=200, merge_distance=20)
+            np.array(resized_image),
+            cam_resized,
+            threshold=0.2,
+            dilation_iter=3,
+            min_area=200,
+            merge_distance=20,
+            line_width=1)
     else:
         boxed_overlay = np.array(resized_image)
 
