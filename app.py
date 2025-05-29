@@ -5,7 +5,7 @@ from PIL import Image
 import cv2
 import numpy as np
 
-from utils.model import BinaryCNN
+from utils.model import BinaryCNN, BinaryImprovedCNN
 from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 
 
@@ -15,7 +15,7 @@ st.title("Классификация глазного дна: Здоров / Д�
 
 with st.sidebar:
     st.markdown("### ℹ️ Используемая модель")
-    st.markdown("- 📂 Файл: `model1.pth`")
+    st.markdown("- 📂 Файл: `model2.pth`")
     st.markdown("- 🎯 Классы: Здоровое состояние / Диабетическая ретинопатия")
 
 # --- Классы ---
@@ -33,8 +33,8 @@ device = torch.device(
 
 @st.cache_resource
 def load_model():
-    model = BinaryCNN()
-    model.load_state_dict(torch.load("data/model1.pth", map_location=device))
+    model = BinaryImprovedCNN()
+    model.load_state_dict(torch.load("data/model2.pth", map_location=device))
     model.to(device)
     model.eval()
     return model
