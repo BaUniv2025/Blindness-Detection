@@ -3,31 +3,32 @@ import torch
 from torchvision import transforms
 from PIL import Image
 import cv2
+import numpy as np
 
 from utils.model import BinaryCNN
 from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 
-# --- Настройки интерфейса ---
-st.set_page_config(page_title="Диагностика DR", layout="centered")
-st.title("🧠 Классификация глазного дна: Healthy / Diabetic Retinopathy")
+# --- Настройки страницы ---
+st.set_page_config(page_title="Диагностика ретинопатии", layout="wide")
+st.title("🧠 Классификация глазного дна: Здоров / Диабетическая ретинопатия")
 
-class_names = ["Healthy", "Diabetic Retinopathy"]
+# --- Классы ---
+class_names = ["Здоровое состояние", "Диабетическая ретинопатия"]
 
-# --- Определение устройства ---
+# --- Устройство ---
 device = torch.device(
     "mps" if torch.backends.mps.is_available() else
     "cuda" if torch.cuda.is_available() else
     "cpu"
 )
 
-# --- Загрузка модели ---
+# --- Модель ---
 
 
 @st.cache_resource
 def load_model():
     model = BinaryCNN()
-    model.load_state_dict(torch.load(
-        "data/model1.pth", map_location=device))
+    model.load_state_dict(torch.load("data/model1.pth", map_location=device))
     model.to(device)
     model.eval()
     return model
@@ -35,52 +36,59 @@ def load_model():
 
 model = load_model()
 
-# --- Трансформация изображения ---
+# --- Преобразование ---
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor()
 ])
 
-# --- Загрузка изображения ---
+# --- Загрузка файла ---
+st.markdown("#### Загрузите изображение глазного дна (JPG/PNG):")
 uploaded_file = st.file_uploader(
-    "Загрузите изображение глаза (JPG/PNG)", type=["jpg", "jpeg", "png"])
+    label="", type=["jpg", "jpeg", "png"], label_visibility="collapsed"
+)
 
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
-    st.image(image, caption="Загруженное изображение",
-             use_container_width=True)
+    resized_image = image.resize((224, 224))
+    image_tensor = transform(resized_image).to(device)
 
-    image_tensor = transform(image).to(device)  # type: ignore
-
-    # --- Инференс ---
     with torch.no_grad():
         logit = model(image_tensor.unsqueeze(0))
         prob = torch.sigmoid(logit).item()
         prediction = int(prob >= 0.5)
 
-    # --- Вывод вероятностей ---
-    prob_healthy = 1 - prob
     prob_dr = prob
+    prob_healthy = 1 - prob
     pred_class = class_names[prediction]
 
-    st.markdown(f"### Предсказание: **{pred_class}**")
+    st.markdown(f"### 🩺 Предсказание: **{pred_class}**")
     st.markdown(f"""
-    - 🟢 **Healthy**: {prob_healthy:.4f} ({prob_healthy*100:.2f}%)
-    - 🔴 **Diabetic Retinopathy**: {prob_dr:.4f} ({prob_dr*100:.2f}%)
+    - 🟢 **{class_names[0]}**: {prob_healthy:.4f} ({prob_healthy * 100:.2f}%)
+    - 🔴 **{class_names[1]}**: {prob_dr:.4f} ({prob_dr * 100:.2f}%)
     """)
 
-    # --- Grad-CAM ---
-    overlay, cam_resized = generate_gradcam(
-        model, image_tensor, target_class=prediction)
-    boxed_overlay = draw_aggressive_merged_boxes(overlay, cam_resized)
+    # --- Grad-CAM с прямоугольниками ---
+    if prediction == 1:
+        overlay, cam_resized = generate_gradcam(
+            model, image_tensor, target_class=1)
+        boxed_overlay = draw_aggressive_merged_boxes(
+            np.array(resized_image), cam_resized)
+    else:
+        boxed_overlay = np.array(resized_image)
 
-    st.image(boxed_overlay, caption="Grad-CAM с зонами внимания",
-             use_container_width=True)
+    # --- Отображение рядом: Оригинал + Боксы ---
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(resized_image, caption="Оригинал", use_container_width=True)
+    with col2:
+        st.image(boxed_overlay, caption="С зонами внимания",
+                 use_container_width=True)
 
-    # --- Скачивание результата ---
+    # --- Скачивание ---
     st.download_button(
-        label="📥 Скачать Grad-CAM",
+        label="📥 Скачать изображение с зонами",
         data=cv2.imencode(".png", boxed_overlay)[1].tobytes(),
-        file_name="gradcam_result.png",
+        file_name="gradcam_boxes.png",
         mime="image/png"
     )
