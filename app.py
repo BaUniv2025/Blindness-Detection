@@ -63,7 +63,10 @@ def show_side_by_side(left_img, right_img, captions=("Оригинал", "С з�
 # --- Интерфейс загрузки ---
 st.markdown("#### Загрузите изображение глазного дна (JPG/PNG):")
 uploaded_file = st.file_uploader(
-    label="", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
+    label="Загрузите изображение глазного дна",
+    type=["jpg", "jpeg", "png"],
+    label_visibility="collapsed"
+)
 
 if uploaded_file:
     # Оригинальное изображение
@@ -92,7 +95,7 @@ if uploaded_file:
     if prediction == 1:
         _, cam_resized = generate_gradcam(model, image_tensor, target_class=1)
         boxed_overlay = draw_aggressive_merged_boxes(
-            np.array(resized_image), cam_resized)
+            np.array(resized_image), cam_resized, threshold=0.2, dilation_iter=3, min_area=200, merge_distance=20)
     else:
         boxed_overlay = np.array(resized_image)
 
