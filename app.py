@@ -46,26 +46,13 @@ transform = transforms.Compose([
 # --- Утилита для отображения двух изображений бок о бок с одинаковой высотой ---
 
 
-def show_side_by_side(left_img, right_img, captions=("Оригинал", "С зонами внимания"), height=400):
+def show_side_by_side(left_img, right_img, captions=("Оригинал", "С зонами внимания")):
     col1, col2 = st.columns(2)
 
-    def resize_by_height(img, target_h):
-        h, w = img.shape[:2]
-        scale = target_h / h
-        new_w = int(w * scale)
-        return cv2.resize(img, (new_w, target_h))
-
-    # Приводим к numpy
-    if isinstance(left_img, Image.Image):
-        left_img = np.array(left_img)
-
-    left_resized = resize_by_height(left_img, height)
-    right_resized = resize_by_height(right_img, height)
-
     with col1:
-        st.image(left_resized, caption=captions[0])
+        st.image(left_img, caption=captions[0], use_container_width=True)
     with col2:
-        st.image(right_resized, caption=captions[1])
+        st.image(right_img, caption=captions[1], use_container_width=True)
 
 
 # --- Интерфейс загрузки ---
