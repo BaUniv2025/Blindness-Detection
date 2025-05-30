@@ -11,7 +11,7 @@ from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 # Функция для полной русификации поля загрузки файла
 
 
-def _style_language_uploader():
+def style_language_uploader():
     st.markdown("""
     <style>
     /* Скрытие оригинальных надписей */
@@ -20,15 +20,23 @@ def _style_language_uploader():
         display: none !important;
     }
 
-    /* Добавление кастомного текста вместо скрытого */
+    /* Контейнер с нашими кастомными строками */
+    div[data-testid="stFileUploaderDropzoneInstructions"] {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+    }
+
+    /* Первая строка */
     div[data-testid="stFileUploaderDropzoneInstructions"]::before {
         content: "Перетащите изображение сюда или нажмите Обзор";
         display: block;
         font-size: 14px;
         color: #6c757d;
-        margin-bottom: 0.5rem;
     }
 
+    /* Вторая строка — под первой */
     div[data-testid="stFileUploaderDropzoneInstructions"]::after {
         content: "Максимальный размер файла — 200 МБ • JPG, JPEG, PNG";
         display: block;
@@ -114,7 +122,7 @@ def show_side_by_side(left_img, right_img, captions=("Оригинал", "С з�
 
 
 # Русификация интерфейса загрузки
-_style_language_uploader()
+style_language_uploader()
 
 # Интерфейс загрузки
 st.markdown("#### Загрузите изображение глазного дна:")
