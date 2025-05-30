@@ -8,6 +8,56 @@ import numpy as np
 from utils.model import BinaryCNN, BinaryImprovedCNN
 from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 
+# Функция для полной русификации поля загрузки файла
+
+
+def _style_language_uploader():
+    st.markdown("""
+    <style>
+    /* Скрытие стандартных надписей внутри области перетаскивания */
+    div[data-testid="stFileDropzoneInstructions"] span,
+    div[data-testid="stFileDropzoneInstructions"] small {
+        display: none !important;
+    }
+
+    /* Добавление кастомного текста вместо скрытого */
+    div[data-testid="stFileDropzoneInstructions"]::before {
+        content: "Перетащите изображение сюда или нажмите «Обзор»";
+        display: block;
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+    }
+
+    div[data-testid="stFileDropzoneInstructions"]::after {
+        content: "Максимальный размер файла — 200 МБ";
+        display: block;
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    /* Кнопка «Обзор» */
+    div[data-testid="stFileUploader"] button {
+        color: transparent !important;
+        position: relative;
+    }
+
+    div[data-testid="stFileUploader"] button::after {
+        content: "Обзор";
+        color: black;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        pointer-events: none;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 
 # Настройки страницы
 st.set_page_config(page_title="Диагностика ретинопатии", layout="wide")
@@ -62,6 +112,9 @@ def show_side_by_side(left_img, right_img, captions=("Оригинал", "С з�
     with col2:
         st.image(right_img, caption=captions[1], use_container_width=True)
 
+
+# Русификация интерфейса загрузки
+_style_language_uploader()
 
 # Интерфейс загрузки
 st.markdown("#### Загрузите изображение глазного дна (JPG/PNG):")
