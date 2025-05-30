@@ -44,13 +44,14 @@ def style_language_uploader():
         color: #6c757d;
     }
 
-    /* Кнопка «Обзор» */
-    div[data-testid="stFileUploader"] button {
+     /* Скрыть надпись на кнопке загрузки */
+    section[data-testid="stFileUploaderDropzone"] > button[data-testid="stBaseButton-secondary"] {
         color: transparent !important;
         position: relative;
     }
 
-    div[data-testid="stFileUploader"] button::after {
+    /* Добавить русскую надпись «Обзор» */
+    section[data-testid="stFileUploaderDropzone"] > button[data-testid="stBaseButton-secondary"]::after {
         content: "Обзор";
         color: black;
         position: absolute;
