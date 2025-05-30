@@ -14,7 +14,7 @@ from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 def _style_language_uploader():
     st.markdown("""
     <style>
-    /* Скрытие стандартных надписей внутри области перетаскивания */
+    /* Скрытие оригинальных надписей */
     div[data-testid="stFileUploaderDropzoneInstructions"] span,
     div[data-testid="stFileUploaderDropzoneInstructions"] small {
         display: none !important;
@@ -101,7 +101,7 @@ transform = transforms.Compose([
     transforms.ToTensor()
 ])
 
-# Утилита для отображения двух изображений бок о бок с одинаковой высотой
+# Отображение изображений бок о бок
 
 
 def show_side_by_side(left_img, right_img, captions=("Оригинал", "С зонами внимания")):
@@ -117,13 +117,14 @@ def show_side_by_side(left_img, right_img, captions=("Оригинал", "С з�
 _style_language_uploader()
 
 # Интерфейс загрузки
-st.markdown("#### Загрузите изображение глазного дна (JPG/PNG):")
+st.markdown("#### Загрузите изображение глазного дна:")
 uploaded_file = st.file_uploader(
     label="Загрузите изображение глазного дна",
     type=["jpg", "jpeg", "png"],
     label_visibility="collapsed"
 )
 
+# Обработка изображения
 if uploaded_file:
     # Оригинальное изображение
     image = Image.open(uploaded_file).convert("RGB")
