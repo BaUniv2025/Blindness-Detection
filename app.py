@@ -15,22 +15,22 @@ def _style_language_uploader():
     st.markdown("""
     <style>
     /* Скрытие стандартных надписей внутри области перетаскивания */
-    div[data-testid="stFileDropzoneInstructions"] span,
-    div[data-testid="stFileDropzoneInstructions"] small {
+    div[data-testid="stFileUploaderDropzoneInstructions"] span,
+    div[data-testid="stFileUploaderDropzoneInstructions"] small {
         display: none !important;
     }
 
     /* Добавление кастомного текста вместо скрытого */
-    div[data-testid="stFileDropzoneInstructions"]::before {
-        content: "Перетащите изображение сюда или нажмите «Обзор»";
+    div[data-testid="stFileUploaderDropzoneInstructions"]::before {
+        content: "Перетащите изображение сюда или нажмите Обзор";
         display: block;
         font-size: 14px;
         color: #6c757d;
         margin-bottom: 0.5rem;
     }
 
-    div[data-testid="stFileDropzoneInstructions"]::after {
-        content: "Максимальный размер файла — 200 МБ";
+    div[data-testid="stFileUploaderDropzoneInstructions"]::after {
+        content: "Максимальный размер файла — 200 МБ • JPG, JPEG, PNG";
         display: block;
         font-size: 12px;
         color: #6c757d;
