@@ -9,10 +9,11 @@ from utils.model import BinaryCNN, BinaryImprovedCNN
 from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 
 
-# --- Настройки страницы ---
+# Настройки страницы
 st.set_page_config(page_title="Диагностика ретинопатии", layout="wide")
 st.title("Классификация глазного дна: Здоров / Диабетическая ретинопатия")
 
+# Cайдбар с информацией о модели
 with st.sidebar:
     st.markdown("### ℹ️ Используемая модель")
     st.markdown("- 📂 Файл: `model2.pth`")
@@ -20,17 +21,17 @@ with st.sidebar:
         "- 🎯 Классы: \n   - Здоровое состояние \n   - Диабетическая ретинопатия"
     )
 
-# --- Классы ---
+# Классы
 class_names = ["Здоровое состояние", "Диабетическая ретинопатия"]
 
-# --- Устройство ---
+# Выбор устройства
 device = torch.device(
     "mps" if torch.backends.mps.is_available() else
     "cuda" if torch.cuda.is_available() else
     "cpu"
 )
 
-# --- Загрузка модели ---
+# Загрузка модели
 
 
 @st.cache_resource
@@ -44,13 +45,13 @@ def load_model():
 
 model = load_model()
 
-# --- Преобразование изображения ---
+# Преобразование изображения
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor()
 ])
 
-# --- Утилита для отображения двух изображений бок о бок с одинаковой высотой ---
+# Утилита для отображения двух изображений бок о бок с одинаковой высотой
 
 
 def show_side_by_side(left_img, right_img, captions=("Оригинал", "С зонами внимания")):
@@ -62,7 +63,7 @@ def show_side_by_side(left_img, right_img, captions=("Оригинал", "С з�
         st.image(right_img, caption=captions[1], use_container_width=True)
 
 
-# --- Интерфейс загрузки ---
+# Интерфейс загрузки
 st.markdown("#### Загрузите изображение глазного дна (JPG/PNG):")
 uploaded_file = st.file_uploader(
     label="Загрузите изображение глазного дна",
@@ -76,7 +77,7 @@ if uploaded_file:
     resized_image = image.resize((224, 224))
     image_tensor = transform(resized_image).to(device)
 
-    # --- Предсказание ---
+    # Предсказание
     with torch.no_grad():
         logit = model(image_tensor.unsqueeze(0))
         prob = torch.sigmoid(logit).item()
@@ -86,14 +87,14 @@ if uploaded_file:
     prob_healthy = 1 - prob
     pred_class = class_names[prediction]
 
-    # --- Вывод вероятностей ---
+    # Вывод вероятностей
     st.markdown(f"### 🩺 Предсказание: **{pred_class}**")
     st.markdown(f"""
     - 🟢 **{class_names[0]}**: {prob_healthy:.4f} ({prob_healthy * 100:.2f}%)
     - 🔴 **{class_names[1]}**: {prob_dr:.4f} ({prob_dr * 100:.2f}%)
     """)
 
-    # --- Grad-CAM ---
+    # Grad-CAM для визуализации зон внимания
     if prediction == 1:
         _, cam_resized = generate_gradcam(model, image_tensor, target_class=1)
         boxed_overlay = draw_aggressive_merged_boxes(
@@ -107,11 +108,11 @@ if uploaded_file:
     else:
         boxed_overlay = np.array(resized_image)
 
-    # --- Сравнение изображений ---
+    # Сравнение изображений
     st.markdown("### 📷 Сравнение изображений:")
     show_side_by_side(resized_image, boxed_overlay)
 
-    # --- Скачивание результата ---
+    # Скачивание результата
     boxed_bgr = cv2.cvtColor(boxed_overlay, cv2.COLOR_RGB2BGR)
 
     st.download_button(
