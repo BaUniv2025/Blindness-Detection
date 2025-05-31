@@ -8,7 +8,7 @@ import numpy as np
 from utils.model import BinaryCNN, BinaryImprovedCNN
 from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
 
-# Функция для полной русификации поля загрузки файла
+# Функция для русификации дополнительных элементов интерфейса
 
 
 def style_language_uploader():
@@ -20,7 +20,7 @@ def style_language_uploader():
         display: none !important;
     }
 
-    /* Контейнер с нашими кастомными строками */
+    /* Контейнер с кастомными строками */
     div[data-testid="stFileUploaderDropzoneInstructions"] {
         display: flex;
         flex-direction: column;
@@ -28,7 +28,7 @@ def style_language_uploader():
         gap: 0.25rem;
     }
 
-    /* Первая строка */
+    /* Инструкция */
     div[data-testid="stFileUploaderDropzoneInstructions"]::before {
         content: "Перетащите изображение сюда или нажмите Обзор";
         display: block;
@@ -36,7 +36,7 @@ def style_language_uploader():
         color: #6c757d;
     }
 
-    /* Вторая строка — под первой */
+    /* Ограничения */
     div[data-testid="stFileUploaderDropzoneInstructions"]::after {
         content: "Максимальный размер файла — 200 МБ • JPG, JPEG, PNG";
         display: block;
@@ -44,13 +44,13 @@ def style_language_uploader():
         color: #6c757d;
     }
 
-     /* Скрыть надпись на кнопке загрузки */
+     /* Скрытие надписи на кнопке загрузки */
     section[data-testid="stFileUploaderDropzone"] > button[data-testid="stBaseButton-secondary"] {
         color: transparent !important;
         position: relative;
     }
 
-    /* Добавить русскую надпись «Обзор» */
+    /* Добавление новой надписи */
     section[data-testid="stFileUploaderDropzone"] > button[data-testid="stBaseButton-secondary"]::after {
         content: "Обзор";
         color: black;
@@ -63,6 +63,21 @@ def style_language_uploader():
         justify-content: center;
         align-items: center;
         pointer-events: none;
+    }
+    
+    /* Скрытие верхней панели Streamlit полностью */
+    div[data-testid="stToolbar"] {
+        display: none !important;
+    }
+
+    /* Скрыть кнопку Deploy */
+    div[data-testid="stAppDeployButton"] {
+        display: none !important;
+    }
+
+    /* Скрыть меню (три точки) */
+    #MainMenu {
+        display: none !important;
     }
     </style>
     """, unsafe_allow_html=True)
