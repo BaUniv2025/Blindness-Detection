@@ -111,8 +111,11 @@ def generate_gradcam(model, image_tensor, target_class, conv_layer_name='conv3')
     cam = torch.clamp(cam, min=0)  # Оставляем только положительные значения
     cam = cam - cam.min()  # Нормируем карту
     cam = cam / cam.max() if cam.max() != 0 else cam  # Масштабируем к [0, 1]
-    # Изменяем размер до 224x224
-    cam_resized = cv2.resize(cam.numpy(), (224, 224))
+
+    # Получаем высоту и ширину исходного изображения
+    height, width = image_tensor.shape[2], image_tensor.shape[3]
+    # Изменяем размер карты активаций под размер изображения
+    cam_resized = cv2.resize(cam.numpy(), (width, height))
 
     # Накладываем тепловую карту на изображение
     overlay = _make_overlay(image_tensor, cam_resized)
