@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 from utils.model import BinaryCNN, BinaryImprovedCNN
-from utils.visualisation import generate_gradcam, draw_aggressive_merged_boxes
+from utils.visualisation import generate_gradcam, draw_merged_boxes
 
 # Функция для русификации дополнительных элементов интерфейса
 
@@ -153,7 +153,7 @@ if uploaded_file:
     # Оригинальное изображение
     image = Image.open(uploaded_file).convert("RGB")
     resized_image = image.resize((224, 224))
-    image_tensor = transform(resized_image).to(device)
+    image_tensor = transform(resized_image).to(device)  # type: ignore
 
     # Предсказание
     with torch.no_grad():
@@ -175,7 +175,7 @@ if uploaded_file:
     # Grad-CAM для визуализации зон внимания
     if prediction == 1:
         _, cam_resized = generate_gradcam(model, image_tensor, target_class=1)
-        boxed_overlay = draw_aggressive_merged_boxes(
+        boxed_overlay = draw_merged_boxes(
             np.array(resized_image),
             cam_resized,
             threshold=0.2,

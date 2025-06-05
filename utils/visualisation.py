@@ -55,12 +55,13 @@ def _make_overlay(image_tensor, cam_resized):
         np.ndarray: Изображение с наложенной тепловой картой.
     """
     # Создаём цветовую карту
-    heatmap = cv2.applyColorMap(np.uint8(255 * cam_resized), cv2.COLORMAP_JET)
+    heatmap = cv2.applyColorMap(
+        np.uint8(255 * cam_resized), cv2.COLORMAP_JET)  # type: ignore
     img_np = image_tensor.cpu().squeeze(0).permute(
         1, 2, 0).numpy()  # Переводим тензор изображения в numpy
     img_np = np.uint8(255 * img_np)  # Масштабируем значения к [0, 255]
     # Накладываем тепловую карту на изображение
-    overlay = cv2.addWeighted(img_np, 0.6, heatmap, 0.4, 0)
+    overlay = cv2.addWeighted(img_np, 0.6, heatmap, 0.4, 0)  # type: ignore
     return overlay
 
 
@@ -126,7 +127,7 @@ def generate_gradcam(model, image_tensor, target_class, conv_layer_name='conv3')
     return overlay, cam_resized  # Возвращаем наложенное изображение и карту активаций
 
 
-def draw_aggressive_merged_boxes(
+def draw_merged_boxes(
     overlay, cam_resized, threshold=0.5, dilation_iter=3, min_area=300, merge_distance=30, line_width=2, box_color=(255, 255, 255)
 ):
     """
@@ -147,7 +148,8 @@ def draw_aggressive_merged_boxes(
     binary_map = np.uint8(cam_resized > threshold)
     kernel = np.ones((3, 3), np.uint8)
     # Дилатируем бинарную карту
-    dilated = cv2.dilate(binary_map, kernel, iterations=dilation_iter)
+    dilated = cv2.dilate(binary_map, kernel,  # type: ignore
+                         iterations=dilation_iter)  # type: ignore
 
     # Находим контуры на дилатированной карте
     contours, _ = cv2.findContours(
