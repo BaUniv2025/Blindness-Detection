@@ -124,7 +124,7 @@ def generate_gradcam(model, image_tensor, target_class, conv_layer_name='conv3')
 
 
 def draw_aggressive_merged_boxes(
-    overlay, cam_resized, threshold=0.5, dilation_iter=3, min_area=300, merge_distance=30, line_width=2
+    overlay, cam_resized, threshold=0.5, dilation_iter=3, min_area=300, merge_distance=30, line_width=2, box_color=(255, 255, 255)
 ):
     """
     Находит и объединяет области высокой активации на Grad-CAM карте, рисует объединённые прямоугольники.
@@ -136,6 +136,7 @@ def draw_aggressive_merged_boxes(
         min_area (int): Минимальная площадь области для учёта.
         merge_distance (int): Максимальное расстояние для объединения прямоугольников.
         line_width (int): Толщина линии прямоугольника.
+        box_color (tuple): Цвет прямоугольника в формате BGR (по умолчанию белый).
     Returns:
         np.ndarray: Изображение с нарисованными объединёнными прямоугольниками.
     """
@@ -182,5 +183,5 @@ def draw_aggressive_merged_boxes(
     boxed = overlay.copy()  # Копируем изображение для рисования
     # Рисуем прямоугольники
     for x1, y1, x2, y2 in merged:
-        cv2.rectangle(boxed, (x1, y1), (x2, y2), (255, 255, 255), line_width)
+        cv2.rectangle(boxed, (x1, y1), (x2, y2), box_color, line_width)
     return boxed  # Возвращаем изображение с нарисованными прямоугольниками
