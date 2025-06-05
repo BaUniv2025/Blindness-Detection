@@ -100,3 +100,134 @@ class BinaryImprovedCNN(nn.Module):
         x = self.dropout(x)
         x = self.fc(x)
         return x
+
+
+class BinaryCNNBatchNorm(nn.Module):
+    """
+    Добавлен BatchNorm после каждого сверточного слоя.
+    """
+
+    def __init__(self, dropout_prob=0.5):
+        super(BinaryCNNBatchNorm, self).__init__()
+        # Блок 1: (224x224x3) → (112x112x32)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        # Блок 2: (112x112x32) → (56x56x64)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+        # Пулинг для уменьшения пространственных размеров в 2 раза
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # Глобальный пулинг: (56x56x64) → (1x1x64)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+        # Регуляризация для предотвращения переобучения
+        self.dropout = nn.Dropout(dropout_prob)
+        # Полносвязный слой для бинарной классификации
+        self.fc = nn.Linear(64, 1)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.bn1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x
+
+
+class BinaryCNNLeakyReLU(nn.Module):
+    """
+    Использован LeakyReLU вместо ReLU.
+    """
+
+    def __init__(self, dropout_prob=0.5):
+        super(BinaryCNNLeakyReLU, self).__init__()
+        # Блок 1: (224x224x3) → (112x112x32)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        # Блок 2: (112x112x32) → (56x56x64)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+        # Пулинг для уменьшения пространственных размеров в 2 раза
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # Глобальный пулинг: (56x56x64) → (1x1x64)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+        # Регуляризация для предотвращения переобучения
+        self.dropout = nn.Dropout(dropout_prob)
+        # Полносвязный слой для бинарной классификации
+        self.fc = nn.Linear(64, 1)
+        # LeakyReLU вместо ReLU
+        self.activation = nn.LeakyReLU(0.1)
+
+    def forward(self, x):
+        x = self.pool(self.activation(self.bn1(self.conv1(x))))
+        x = self.pool(self.activation(self.bn2(self.conv2(x))))
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x
+
+
+class BinaryCNNExtraConv(nn.Module):
+    """
+    Добавлен дополнительный сверточный слой, остальное как в базовой модели.
+    """
+
+    def __init__(self, dropout_prob=0.5):
+        super(BinaryCNNExtraConv, self).__init__()
+        # Блок 1: (224x224x3) → (112x112x32)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        # Блок 2: (112x112x32) → (56x56x64)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+        # Блок 3: (56x56x64) → (28x28x128)
+        self.conv3 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm2d(128)
+        # Пулинг для уменьшения пространственных размеров в 2 раза
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # Глобальный пулинг: (28x28x128) → (1x1x128)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+        # Регуляризация для предотвращения переобучения
+        self.dropout = nn.Dropout(dropout_prob)
+        # Полносвязный слой для бинарной классификации
+        self.fc = nn.Linear(128, 1)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.bn1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.pool(F.relu(self.bn3(self.conv3(x))))
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.dropout(x)
+        x = self.fc(x)
+        return x
+
+
+class BinaryCNNNoDropout(nn.Module):
+    """
+    Базовая архитектура без Dropout.
+    """
+
+    def __init__(self):
+        super(BinaryCNNNoDropout, self).__init__()
+        # Блок 1: (224x224x3) → (112x112x32)
+        self.conv1 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.bn1 = nn.BatchNorm2d(32)
+        # Блок 2: (112x112x32) → (56x56x64)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(64)
+        # Пулинг для уменьшения пространственных размеров в 2 раза
+        self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
+        # Глобальный пулинг: (56x56x64) → (1x1x64)
+        self.global_pool = nn.AdaptiveAvgPool2d((1, 1))
+        # Полносвязный слой для бинарной классификации
+        self.fc = nn.Linear(64, 1)
+
+    def forward(self, x):
+        x = self.pool(F.relu(self.bn1(self.conv1(x))))
+        x = self.pool(F.relu(self.bn2(self.conv2(x))))
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
