@@ -27,5 +27,5 @@ pip install -r requirements.txt
 Для запуска приложения Streamlit выполните следующую команду в терминале:
 
 ```bash
-streamlit run app.py
+streamlit run main.py
 ```
