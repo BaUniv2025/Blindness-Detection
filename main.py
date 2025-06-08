@@ -194,7 +194,7 @@ if uploaded_file:
     boxed_bgr = cv2.cvtColor(boxed_overlay, cv2.COLOR_RGB2BGR)
 
     st.download_button(
-        label="📥 Скачать изображение с зонами внимания",
+        label="Скачать изображение с зонами внимания",
         data=cv2.imencode(".png", boxed_bgr)[1].tobytes(),
         file_name="gradcam_boxes.png",
         mime="image/png"
