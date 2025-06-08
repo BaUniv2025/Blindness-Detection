@@ -5,7 +5,7 @@ import cv2
 
 def _get_device():
     """
-    Определяет доступное устройство для вычислений (MPS, CUDA или CPU).
+    Определяет доступное устройство для вычислений.
     Returns:
         torch.device: выбранное устройство.
     """
@@ -22,9 +22,9 @@ def _register_hooks(model, conv_layer_name, activations, gradients):
     Регистрирует forward и backward хуки для выбранного слоя.
     Args:
         model: PyTorch модель.
-        conv_layer_name (str): Имя сверточного слоя.
-        activations (dict): Словарь для хранения активаций.
-        gradients (dict): Словарь для хранения градиентов.
+        conv_layer_name: Имя сверточного слоя.
+        activations: Словарь для хранения активаций.
+        gradients: Словарь для хранения градиентов.
     Returns:
         tuple: (forward_handle, backward_handle)
     """
@@ -49,8 +49,8 @@ def _make_overlay(image_tensor, cam_resized):
     """
     Создаёт тепловую карту и накладывает её на исходное изображение.
     Args:
-        image_tensor (torch.Tensor): Входное изображение (с батчем).
-        cam_resized (np.ndarray): Карта активаций, приведённая к размеру изображения.
+        image_tensor: Входное изображение.
+        cam_resized: Карта активаций, приведённая к размеру изображения.
     Returns:
         np.ndarray: Изображение с наложенной тепловой картой.
     """
@@ -70,13 +70,13 @@ def generate_gradcam(model, image_tensor, target_class, conv_layer_name='conv3')
     Генерирует Grad-CAM карту для заданного изображения и класса.
     Args:
         model: PyTorch модель.
-        image_tensor (torch.Tensor): Входное изображение (C, H, W).
-        target_class (int): Индекс целевого класса.
-        conv_layer_name (str): Имя сверточного слоя для визуализации.
+        image_tensor: Входное изображение.
+        target_class: Индекс целевого класса.
+        conv_layer_name: Имя сверточного слоя для визуализации.
     Returns:
         tuple: (overlay, cam_resized)
-            overlay (np.ndarray): Изображение с наложенной тепловой картой.
-            cam_resized (np.ndarray): Карта активаций, приведённая к размеру изображения.
+            overlay: Изображение с наложенной тепловой картой.
+            cam_resized: Карта активаций, приведённая к размеру изображения.
     """
     model.eval()  # Переводим модель в режим оценки
     device = _get_device()  # Определяем устройство для вычислений
@@ -133,14 +133,14 @@ def draw_merged_boxes(
     """
     Находит и объединяет области высокой активации на Grad-CAM карте, рисует объединённые прямоугольники.
     Args:
-        overlay (np.ndarray): Изображение с наложенной тепловой картой.
-        cam_resized (np.ndarray): Карта активаций Grad-CAM.
-        threshold (float): Порог для бинаризации карты активаций.
-        dilation_iter (int): Количество итераций дилатации.
-        min_area (int): Минимальная площадь области для учёта.
-        merge_distance (int): Максимальное расстояние для объединения прямоугольников.
-        line_width (int): Толщина линии прямоугольника.
-        box_color (tuple): Цвет прямоугольника в формате BGR (по умолчанию белый).
+        overlay: Изображение с наложенной тепловой картой.
+        cam_resized: Карта активаций Grad-CAM.
+        threshold: Порог для бинаризации карты активаций.
+        dilation_iter: Количество итераций дилатации.
+        min_area: Минимальная площадь области для учёта.
+        merge_distance: Максимальное расстояние для объединения прямоугольников.
+        line_width: Толщина линии прямоугольника.
+        box_color: Цвет прямоугольника в формате BGR (по умолчанию белый).
     Returns:
         np.ndarray: Изображение с нарисованными объединёнными прямоугольниками.
     """
